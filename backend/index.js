@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB local connection
-mongoose.connect("mongodb://127.0.0.1:27017/coffee_shop_db")
+mongoose.connect("mongodb+srv://janjuatariq7614_db_user:tyfrkGJP0uB9oaOz@coffee-shop.3xuvmty.mongodb.net/?appName=coffee-shop")
   .then(() => console.log("Connected to MongoDB"))
   .catch(err => console.error("MongoDB connection failed:", err));
 
