@@ -9,7 +9,7 @@ export default function App() {
   const fetchMenu = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://192.168.0.120:3000/menu");
+      const res = await fetch("https://midterm-mad-solution.vercel.app/menu");
       const data = await res.json();
       setMenu(data);
     } catch (err) {
@@ -21,7 +21,7 @@ export default function App() {
   const fetchRandom = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://192.168.0.120:3000/menu/random");
+      const res = await fetch("https://midterm-mad-solution.vercel.app/menu/random");
       const data = await res.json();
       setMenu([data]);
     } catch (err) {
