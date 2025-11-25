@@ -1,34 +1,65 @@
-import React, { useState } from "react";
-import { View, FlatList, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, FlatList, StyleSheet, Alert } from "react-native";
 import { Provider as PaperProvider, Button, Card, Title, Paragraph, Text } from "react-native-paper";
+
+// API URL configuration - uses environment variable or defaults to localhost
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://midterm-mad-solution.vercel.app";
 
 export default function App() {
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const fetchMenu = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await fetch("https://midterm-mad-solution.vercel.app/menu");
-      const data = await res.json();
-      setMenu(data);
+      const res = await fetch(`${API_URL}/menu`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const response = await res.json();
+      // Backend returns { success: true, data: [...] }
+      if (response.success && response.data) {
+        setMenu(response.data);
+      } else {
+        throw new Error("Invalid response format from server");
+      }
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching menu:", err);
+      setError(`Failed to load menu: ${err.message}`);
+      Alert.alert("Error", `Failed to load menu: ${err.message}`);
     }
     setLoading(false);
   };
 
   const fetchRandom = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await fetch("https://midterm-mad-solution.vercel.app/menu/random");
-      const data = await res.json();
-      setMenu([data]);
+      const res = await fetch(`${API_URL}/menu/random`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const response = await res.json();
+      // Backend returns { success: true, data: {...} }
+      if (response.success && response.data) {
+        setMenu([response.data]);
+      } else {
+        throw new Error("Invalid response format from server");
+      }
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching random item:", err);
+      setError(`Failed to load random item: ${err.message}`);
+      Alert.alert("Error", `Failed to load random item: ${err.message}`);
     }
     setLoading(false);
   };
+
+  // Load menu data when component mounts
+  useEffect(() => {
+    fetchMenu();
+  }, []);
 
   // Header component for FlatList
   const ListHeader = () => (
@@ -53,6 +84,7 @@ export default function App() {
         </Button>
       </View>
       {loading && <Text style={styles.loading}>Loading...</Text>}
+      {error && <Text style={styles.error}>{error}</Text>}
     </View>
   );
 
@@ -136,5 +168,14 @@ const styles = StyleSheet.create({
     color: "#6d4c41",
     marginVertical: 10,
     textAlign: "center",
-  },
+  },
+  error: {
+    fontSize: 14,
+    color: "#d32f2f",
+    marginVertical: 10,
+    textAlign: "center",
+    padding: 10,
+    backgroundColor: "#ffebee",
+    borderRadius: 8,
+  },
 });
